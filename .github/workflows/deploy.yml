@@ -1,16 +1,20 @@
-name: Hello Shell Script
+name: Push-triggered Workflow
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  say-hello:
+  print-info:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Hello Script
+      - name: Print commit info
         run: |
-          echo "hello"
+          echo "Pushed branch: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Pusher: ${{ github.actor }}"
 
