@@ -1,0 +1,6 @@
+replicaCount: 3
+# Add other custom settings here, for example:
+# resources:
+#   limits:
+#     cpu: 2
+#     memory: 4Gi
