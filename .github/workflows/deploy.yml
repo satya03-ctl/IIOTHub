@@ -1,4 +1,4 @@
-name: Push-triggered Workflow
+name: Deploy HiveMQ Platform via Helm
 
 on:
   push:
@@ -6,27 +6,31 @@ on:
       - main
 
 jobs:
-  print-info:
-    runs-on: ubuntu-latest
+  deploy-hivemq:
+    name: Deploy HiveMQ Platform
+    runs-on: self-hosted   # Must be your local runner with k8s access
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
 
       - name: Set up Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@v4
 
-      - name: Print kubectl version
-        run: kubectl version --client
-
-      - name: Print Helm version
-        run: helm version
-
-      - name: Print commit info
+      - name: Configure kubeconfig from base64 secret
         run: |
-          echo "Pushed branch: ${{ github.ref }}"
-          echo "Commit SHA: ${{ github.sha }}"
-          echo "Pusher: ${{ github.actor }}"
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
 
+      - name: Create 'hivemq' namespace if missing
+        run: kubectl create namespace hivemq --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy HiveMQ Platform Helm Chart
+        run: |
+          helm upgrade --install hivemq-platform ./charts/hivemq-platform \
+            -n hivemq --create-namespace -f ./charts/hivemq-platform/values.yaml
+
+      - name: Verify HiveMQ deployment pods
+        run: kubectl get pods -n hivemq
