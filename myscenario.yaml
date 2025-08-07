@@ -1,0 +1,10 @@
+scenario:
+  clients:
+    count: 10
+  actions:
+    - connect:
+        broker: "tcp://hivemq-test-hivemq-platform-mqtt-1883:1883"
+    - publish:
+        topic: "test/load"
+        message: "hello swarm"
+        count: 500
