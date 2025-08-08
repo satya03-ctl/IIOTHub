@@ -1,14 +1,12 @@
 name: Deploy HiveMQ Platform via Helm
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy-hivemq:
     name: Deploy HiveMQ Platform
-    runs-on: self-hosted   # Must be your local runner with k8s access
+    runs-on: self-hosted   # Your local runner with k8s access
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
